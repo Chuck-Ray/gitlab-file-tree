@@ -12,7 +12,29 @@ var vm = {
     setting: {
         toggle: true,
         recursive: true,
-        containerWidth: "230px"
+        containerWidth: "230px",
+        lang: 'zh'
+    },
+    i18n: {
+        en: {},
+        zh: {
+            "Save": "保存",
+            "Load entire tree at once(100 at most)": "一次载入整个文件列表(最多100个)",
+            "Language": "语言",
+            "Search": "搜索",
+            "Setting":"设置",
+        }
+    },
+    translate: function (str) {
+        if (vm.i18n[vm.setting.lang][str]) return vm.i18n[vm.setting.lang][str];
+        return str
+    },
+    applySetting: function () {
+        let setting = vm.setting;
+        if (setting) {
+            $(":radio[name=lang][value=" + setting.lang + "]").attr('checked', true);
+            $(":checkbox[name=recursive]").attr('checked', setting.recursive);
+        }
     },
     /* Detection if we are on GitLab page */
     isGitLab: function () {
@@ -42,7 +64,79 @@ var vm = {
         vm.project_id = $('#project_id').val() || $('#search_project_id').val();
         vm.apiRepoTree = vm.apiRootUrl + '/api/v4/projects/' + vm.project_id + '/repository/tree';
         vm.repository_ref = $('#repository_ref').val();
-        //console.info(vm)
+        vm.apiBranches = vm.apiRootUrl + '/api/v4/projects/' + vm.project_id + '/repository/branches';
+    },
+    loadBranche: function () {
+        $.get(vm.apiBranches, {
+            id: vm.project_id
+        }, function (result) {
+            let is_single_commit = true;
+            result.map(v => {
+                if(v.name == vm.repository_ref){is_single_commit = false}
+                $("#branches").append("<option value='" + v.name + "'>" + v.name + "</option>");
+            })
+            if(is_single_commit){
+                $("#branches").append("<option value='" + vm.repository_ref + "'>" + vm.repository_ref + "</option>");
+            }
+            $("#branches").val(vm.repository_ref);
+            $('#branches').change(function () {
+                let val = $(this).children('option:selected').val()
+                let href = location.href.replace(vm.repository_ref,val)
+                vm.repository_ref = val;
+                vm.initTree();
+                vm.loadFileTree();
+                vm.loadHTML(href)
+            })
+        });
+    },
+    loadHTML: function (href,history_url) {
+        $.ajax({
+            type: "GET",
+            url: href,
+            dataType: 'html',
+            success: function (data) {
+                var content = $(data).find(".content-wrapper").html();
+
+                try {
+                    $(".content-wrapper").html(content);
+                    vm.syncCurrentUrl(history_url);
+                } catch (err) {
+                    //console.info(err);
+                } finally {
+                    //加载内容
+                    $.ajax({
+                        type: "GET",
+                        url: href + '?format=json&viewer=simple',
+                        dataType: 'json',
+                        success: function (result) {
+                            $(".blob-viewer").replaceWith(result.html)
+                            vm.syncCurrentUrl(history_url);
+                        }
+                    });
+                }
+
+            },
+            error:function (arguments) {
+                let href = `${vm.apiRootUrl}/${vm.shortcuts_project}/tree/${vm.repository_ref}/`;
+                vm.loadHTML(href,href)
+            }
+        })
+    },
+    syncCurrentUrl: function (history_url) {
+            let url;
+            if(history_url){
+                url = history_url;
+            }else{
+                url = $('.repo-breadcrumb li:last-child>a').attr('href');
+            }
+            window.history.pushState(null, null, url);
+    },
+    loadFileTree: function (arguments) {
+        if (vm.setting.recursive) {
+            vm.loadRecursiveNode();
+        } else {
+            vm.loadNode(null);
+        }
     },
     loadNode: function (parentNode) {
         if (parentNode && (parentNode.zAsync || parentNode.isAjaxing)) {
@@ -64,12 +158,12 @@ var vm = {
             path: parentNode ? parentNode.path : null,
             ref: vm.repository_ref
         };
-
-        if (vm.rss_mode) {
-            param.rss_token = vm.rss_token;
-        } else {
-            param.private_token = vm.private_token;
-        }
+        vm.path = param.path;
+        // if (vm.rss_mode) {
+        //     param.rss_token = vm.rss_token;
+        // } else {
+        //     param.private_token = vm.private_token;
+        // }
 
         $.get(vm.apiRepoTree, param, function (result) {
             if (parentNode) {
@@ -96,14 +190,15 @@ var vm = {
         var param = {
             id: vm.project_id,
             recursive: true,
-            ref_name: vm.repository_ref
+            ref_name: vm.repository_ref,
+            per_page: 999999,
         };
 
-        if (vm.rss_mode) {
-            param.rss_token = vm.rss_token;
-        } else {
-            param.private_token = vm.private_token;
-        }
+        // if (vm.rss_mode) {
+        //     param.rss_token = vm.rss_token;
+        // } else {
+        //     param.private_token = vm.private_token;
+        // }
 
         $.get(vm.apiRepoTree, param, function (result) {
             var treeArr = [];
@@ -138,7 +233,7 @@ var vm = {
             ztree.selectNode(ztree.getNodeByParam("id", selectNodeId));
         });
     },
-    openCurrentPathAndReturnNodeId: function(nodes) {
+    openCurrentPathAndReturnNodeId: function (nodes) {
         var path = $("#path").val();
         if (path.length === 0) {
             return path;
@@ -162,7 +257,8 @@ var vm = {
             $(".gitlabTreeView_sidebar").css("width", vm.setting.containerWidth);
         } else {
             $(".gitlabTreeView_sidebar").animate({
-                "width": vm.setting.containerWidth
+                "width": vm.setting.containerWidth,
+                "border-width":"1px"
             }, 'fast', "linear", function () {
                 $(".gitlabTreeView_toggle i").removeClass().addClass("fa fa-arrow-left");
             });
@@ -175,9 +271,10 @@ var vm = {
         $("html").css("margin-left", "0px");
         vm.handleHeaderAndSideBar();
         $(".gitlabTreeView_sidebar").animate({
-            "width": "0px"
+            "width": "0px",
+            "border-width":"0px"
         }, 'fast', "linear", function () {
-            $(".gitlabTreeView_toggle i").removeClass().addClass("fa fa-arrow-right");
+            $(".gitlabTreeView_toggle i").removeClass().addClass("fa fa-tree");
         });
     },
     // 处理打开或关闭的时候header和sidebar的状态 - gitlab10
@@ -226,33 +323,7 @@ var vm = {
     selectNode: function (treeNode) {
         if (treeNode.type === 'blob') {
             var href = window.location.origin + '/' + vm.shortcuts_project + '/blob/' + vm.repository_ref + '/' + treeNode.path;
-
-            //加载文件信息
-            $.ajax({
-                type: "GET",
-                url: href,
-                dataType: 'html',
-                success: function (data) {
-                    var content = $(data).find(".content-wrapper").html();
-
-                    try {
-                        $(".content-wrapper").html(content);
-                    } catch (err) {
-                        //console.info(err);
-                    } finally {
-                        //加载内容
-                        $.ajax({
-                            type: "GET",
-                            url: href + '?format=json&viewer=simple',
-                            dataType: 'json',
-                            success: function (result) {
-                                $(".blob-viewer").replaceWith(result.html)
-                            }
-                        });
-                    }
-
-                }
-            })
+            vm.loadHTML(href)
         } else if (treeNode.type === 'tree') {
             var href = window.location.origin + '/' + vm.shortcuts_project + '/tree/' + vm.repository_ref + '/' + treeNode.path;
             $.ajax({
@@ -300,6 +371,11 @@ var vm = {
             return (obj == null || obj.length <= 0) ? true : false;
         }
     },
+    jumpToSearch:function (arguments) {
+        let search_url = $('.shortcuts-find-file').attr('href');
+        // vm.loadHTML(search_url,search_url);
+        location.href = search_url;
+    },
     search: function (searchValue) {
         var treeObj = vm.getZTree();
         var allNode = treeObj.transformToArray(treeObj.getNodes());
@@ -342,7 +418,7 @@ var vm = {
         zTree.showNodes(nodeList);
     },
     // 容器是否处于调整大小状态
-    isResizing: function() {
+    isResizing: function () {
         return !!$(".gitlabTreeView_resizable").data("resize");
     },
     init: function () {
@@ -355,20 +431,23 @@ var vm = {
         vm.shortcuts_project = "" + $(".shortcuts-project").attr("href");
         vm.shortcuts_project = vm.shortcuts_project.substring(1);
         var shortcuts = vm.shortcuts_project.replace("/", " / ");
-
+        //setting
+        vm.setting = vm.getSetting() != null ? vm.getSetting() : vm.setting;
         var nav = "<nav class='gitlabTreeView_sidebar'>";
         nav += "<a class='gitlabTreeView_toggle'><i class='fa fa-arrow-left'></i></a>";
         nav += "<div class='gitlabTreeView_content'>";
         nav += "<div class='gitlabTreeView_resizable'></div>";
         nav += "<div class='gitlabTreeView_header'>";
         nav += "<div class='gitlabTreeView_header_repo'><i class='fa fa-gitlab gitlabTreeView_tab'></i>" + shortcuts + "</div>";
-        nav += "<div class='gitlabTreeView_header_branch'><i class='fa fa-share-alt gitlabTreeView_tab'></i>" + vm.repository_ref + "</div>";
-
-        nav += "<div class='gitlabTreeView_header_search'><input type='search' class='gitlabTreeView_search_text' placeholder='Search' /><i class='fa fa-search gitlabTreeView_search_icon'></i> <i class='fa fa-cog gitlabTreeView_cog_icon'></i></div>";
+        nav += "<div class='gitlabTreeView_header_branch'><i class='fa fa-share-alt gitlabTreeView_tab'></i><select id='branches'></select></div>";
+        nav += "<div class='gitlabTreeView_header_search'><i class='fa fa-search gitlabTreeView_search_icon' title='" + vm.translate('Search') + "' ></i> <i class='fa fa-cog gitlabTreeView_cog_icon' title='" + vm.translate('Setting') + "'></i></div>";
 
         nav += "<div class='gitlabTreeView_header_setting'>"
-        nav += "<div><label><input type='checkbox' name='recursive' checked> Load entire tree at once</label></div>";
-        nav += "<div><button class='gitlabTreeView_header_setting_save'>Save</button></div>";
+        nav += "<div><label><input type='checkbox' name='recursive'>" + vm.translate('Load entire tree at once(100 at most)') + "</label></div>";
+        nav += "<div><label>" + vm.translate('Language') + ":</label></div>";
+        nav += "<div><label><input type='radio' name='lang' value='en'> English </label></div>";
+        nav += "<div><label><input type='radio' name='lang' value='zh'> 简体中文 </label></div>";
+        nav += "<div><button class='gitlabTreeView_header_setting_save'>" + vm.translate('Save') + "</button></div>";
         nav += "</div>";
 
         nav += "</div>";
@@ -376,9 +455,8 @@ var vm = {
         nav += "</div>";
         nav += "</div>";
         $("body").append($(nav));
+        vm.applySetting();
 
-        //setting
-        vm.setting = vm.getSetting() != null ? vm.getSetting() : vm.setting;
 
 
         if (vm.setting.toggle) {
@@ -388,7 +466,7 @@ var vm = {
         }
 
         $(".gitlabTreeView_toggle").on('click', function () {
-            if ($(".gitlabTreeView_sidebar").width() > 0) {
+            if ($(".gitlabTreeView_sidebar").width()>>0 > 0) {
                 vm.hideTree();
             } else {
                 vm.showTree();
@@ -397,19 +475,19 @@ var vm = {
 
         /** resize */
         // 调整容器宽度，最小宽度100px
-        $(".gitlabTreeView_resizable").on("mousedown", function(){
+        $(".gitlabTreeView_resizable").on("mousedown", function () {
             $(this).data("resize", true);
-        }).on("mouseup", function(){
+        }).on("mouseup", function () {
             $(this).data("resize", false);
         });
-        $(document).on("mousemove", function(event){
+        $(document).on("mousemove", function (event) {
             if (vm.isResizing()) {
                 var width = event.clientX < 100 ? 100 : event.clientX;
                 vm.setting.containerWidth = width + "px";
                 vm.showTree();
                 event.preventDefault();
             }
-        }).on("mouseup", function(){
+        }).on("mouseup", function () {
             if (vm.isResizing()) {
                 $(".gitlabTreeView_resizable").data("resize", false);
             }
@@ -432,10 +510,7 @@ var vm = {
 
         /** clear value and search */
         $(".gitlabTreeView_search_icon").on('click', function () {
-            $(".gitlabTreeView_search_text").val('');
-            var e = $.Event("keyup");
-            e.keyCode = 13;
-            $(".gitlabTreeView_search_text").trigger(e);
+            vm.jumpToSearch();
         });
 
         $(".gitlabTreeView_cog_icon").on("click", function () {
@@ -447,9 +522,13 @@ var vm = {
             $(".gitlabTreeView_header_setting input[type=checkbox]").each(function () {
                 var name = $(this).attr('name');
                 vm.setting[name] = $(this).is(':checked');
-                vm.saveSetting();
             });
-
+            $(".gitlabTreeView_header_setting input[type=radio]").each(function () {
+                var name = $(this).attr('name');
+                vm.setting[name] = $('input[name="' + name + '"]:checked').val();
+            });
+            vm.saveSetting();
+            location.reload();
             $(".gitlabTreeView_header_setting").slideUp();
         })
 
@@ -459,6 +538,7 @@ var vm = {
             $(this).prop('checked', value);
         });
 
+
         vm.initTree();
 
         if (vm.setting.recursive) {
@@ -466,6 +546,8 @@ var vm = {
         } else {
             vm.loadNode(null);
         }
+
+        vm.loadBranche();
     }
 };
 

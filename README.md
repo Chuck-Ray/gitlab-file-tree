@@ -1,52 +1,82 @@
-# GitLab-TreeView
+# GitLab File Tree GitLab 文件树
 
-Chrome extension to show a code tree on GitLab  :)
+🎄GitLab File Treeview as a Chrome extension, Feel free to show your ❤️ by giving a star ⭐️
+GitLab 文件树插件, 好用又快乐 ๑乛◡乛๑, 喜欢还请一键⭐️！
+
+fork form [GitLab TreeView][1],fixed it that hasn't been maintained for two years and added new functions
+修复自两年前的GitLab TreeView，外加一些新功能
+
+[【中文说明点击这里】][2]
+
+----
+English：  
 
 ## Features
 
-- Quick preview code
-- GitLab UI style
-- Search File
-- Support gitlab 9.x version
+- 📂 Quick preview treeview
+- 🎨 GitLab UI style
+- 🔎 Search File
+- ↔️ customizable width
+- 🚀 Support gitlab 9.x version to lastest version
+- 🕶️ switch branche in the same path
+- 🌐 multilanguage ( english and chinese now )
 
-## Installation
+## Installation 安装
 
-[Chrome](https://chrome.google.com/webstore/detail/gitlab-treeview/kfjchffabpogdehadpflljaikjicdpng)
+[Chrome]()
 
-## Screenshot
+## Screenshot 截图
 
-![](https://raw.githubusercontent.com/linsage/gitlab-treeview/master/screenshot/gitlab-treeview.gif)
+![]()
 
 
 ## Change Log
- - v1.6
-    - api V3 to api V4
- - v1.5
-    - add expand the current file path
- - v1.4
-    - fix bug On gitlab 10.x, don't cover header and sidebar
-    - container width resizable
- - v1.3
-    - fix bug On gitlab 10.x, rss_token instead of private_token.
- - v1.2
-    - add css loading
-    - add options setting 
-    - search file
-    - load entire tree at once
- - v1.1
-    - basic function 
  - v1.0
-    - initial version
-
-## More
-
-- Email：[linsage@live.com](mailto:linsage@live.com)
-- Blog：[https://linsage.com](https://linsage.com)
+    - fix old plugin, add switch branche and multi-language
 
 ## Support
 
-[Donate with PayPal](https://www.paypal.me/linsage)
-![](https://note-1256162930.picgz.myqcloud.com/zo1mm.jpg)
+Give me a Like
 
 ## License
 [MIT](LICENSE)
+
+----
+<span id='chinese'></span>
+## 功能
+
+- 📂 树形预览文件
+- 🎨 GitLab 风格UI
+- 🔎 文件搜索
+- ↔ ️自定义宽度
+- 🚀 支持 gitlab 9.x 以上版本
+- 🕶 同目录分支切换
+- 🌐 多语言支持（英语和中文，还有需要欢迎提request）
+
+## 安装
+
+[Chrome]()
+
+## 截图
+
+![]()
+
+
+## 更改日志
+ 
+ - v1.0
+    - 修复控件，增加语言切换与分支切换功能
+
+## 支持
+
+Give me a Like
+
+## 许可
+
+[MIT](LICENSE)
+
+欢迎fork，也欢迎加入到项目里来一起添砖加瓦
+
+
+  [1]: https://github.com/linsage/gitlab-treeview
+  [2]: #chinese

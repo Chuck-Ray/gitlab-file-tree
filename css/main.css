@@ -434,14 +434,8 @@ ul.ztree.zTreeDragUL {
 }
 
 a.gitlabTreeView_toggle {
-  width: 30px;
-  height: 30px;
-  padding: 6px 6px !important;
-  top: 60px;
-  right: -40px;
   text-align: center;
   vertical-align: middle;
-  line-height: 1;
   cursor: pointer;
   z-index: 1000003;
   position: absolute;
@@ -450,6 +444,14 @@ a.gitlabTreeView_toggle {
   border-radius: 0.25em;
   text-decoration: none;
   background-color: white;
+  right: -15px;
+  height: 50px;
+  width: 15px;
+  top: 50%;
+  line-height: 50px;
+  border-left: 0;
+  box-sizing: content-box;
+  padding: 0;
 }
 
 .gitlabTreeView_content {
@@ -498,12 +500,10 @@ a.gitlabTreeView_toggle {
   padding-top: 2px;
 }
 
-.gitlabTreeView_cog_icon {
-  float: right;
-  position: relative;
-  top: 6px;
-  right: 6px;
+.gitlabTreeView_cog_icon,.gitlabTreeView_search_icon {
+  float: left;
   cursor: pointer;
+  padding: 6px;
 }
 
 .gitlabTreeView_header_search {
@@ -521,14 +521,7 @@ a.gitlabTreeView_toggle {
   font-size: 13px;
   padding: 4px 16px 4px 6px;
   line-height: 20px;
-  width: 60%;
-}
-
-.gitlabTreeView_search_icon {
-  position: relative;
-  right: 18px;
-  top: 0;
-  color: #e7e9ed;
+  width: 80%;
 }
 
 .gitlabTreeView_search_icon.active {
@@ -570,4 +563,10 @@ a.gitlabTreeView_toggle {
   right: 0;
   cursor: col-resize;
   z-index: 9999;
+}
+.gitlabTreeView_header_setting label{
+  margin: 0;
+}
+#branches{
+  width: 150px;
 }
