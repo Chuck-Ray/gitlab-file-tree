@@ -1,7 +1,7 @@
 # GitLab File Tree GitLab 文件树
 
 🎄GitLab File Treeview as a Chrome extension, Feel free to show your ❤️ by giving a star ⭐️
-GitLab 文件树插件, 好用又快乐 ๑乛◡乛๑, 喜欢还请一键⭐️！
+GitLab 文件树插件, 好用又快乐 ๑乛◡乛๑, 喜欢还请一键 Star⭐️！
 
 fork form [GitLab TreeView][1],fixed it that hasn't been maintained for two years and added new functions
 修复自两年前的GitLab TreeView，外加一些新功能
@@ -21,13 +21,13 @@ English：
 - 🕶️ switch branche in the same path
 - 🌐 multilanguage ( english and chinese now )
 
-## Installation 安装
+## Installation
 
 [Chrome]()
 
-## Screenshot 截图
+## Screenshot
 
-![]()
+![image](https://github.com/Chuck-Ray/gitlab-file-tree/blob/master/screenshot/screenshot.gif?raw=true)
 
 
 ## Change Log
@@ -36,7 +36,7 @@ English：
 
 ## Support
 
-Give me a Like
+Feel free to show your ❤️ by giving a star ⭐️
 
 ## License
 [MIT](LICENSE)
@@ -59,7 +59,7 @@ Give me a Like
 
 ## 截图
 
-![]()
+![image](https://github.com/Chuck-Ray/gitlab-file-tree/blob/master/screenshot/screenshot.gif?raw=true)
 
 
 ## 更改日志
@@ -69,7 +69,7 @@ Give me a Like
 
 ## 支持
 
-Give me a Like
+喜欢还请一键 Star⭐️！
 
 ## 许可
 
