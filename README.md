@@ -23,7 +23,7 @@ English：
 
 ## Installation
 
-[Chrome]()
+[Chrome](https://chrome.google.com/webstore/detail/pomhmogniglighnjgoihcidfggpciklp)
 
 ## Screenshot
 
@@ -55,7 +55,7 @@ Feel free to show your ❤️ by giving a star ⭐️
 
 ## 安装
 
-[Chrome]()
+[Chrome商店](https://chrome.google.com/webstore/detail/pomhmogniglighnjgoihcidfggpciklp)
 
 ## 截图
 
